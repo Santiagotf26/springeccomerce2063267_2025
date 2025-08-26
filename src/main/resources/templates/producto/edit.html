@@ -29,30 +29,37 @@
 				<div class="card-body">
 					<h5 class="card-title">Crear Producto</h5>
 					
-					<form th:action="@{/producto/save}" method="post" enctype="multipart/form-data">
+					<form th:action="@{/producto/update}" method="post" enctype="multipart/form-data">
+						<div>
+							<input type="hidden" name="id" id="id" th:value="${producto.id}">
+						</div>
 						<div class="row mb-3">
 							<label for="inputText"class="col-sm-2 col-form-label">Nombre: </label>
 							<div class="col-sm-10">
-								<input type="text" class="form-control" id="nombre" name="nombre" placeholder="Ingrese el nombre del producto" autocompete="off" required>						
+								<input type="text" class="form-control" id="nombre" name="nombre" placeholder="Ingrese el nombre del producto" autocompete="off" required 
+								th:value="${producto.nombre}">						
 							</div>
 
 						</div>
 						<div class="row mb-3">
 							<label for="inputText"class="col-sm-2 col-form-label">Descripcion: </label>
 									<div class="col-sm-10">
-										<input type="text" class="form-control" id="descripcion" name="descripcion" placeholder="Ingrese la descripcion del producto" autocompete="off" required>						
+										<input type="text" class="form-control" id="descripcion" name="descripcion" placeholder="Ingrese la descripcion del producto" autocompete="off" required 
+										th:value="${producto.descripcion}">						
 									</div>
 						</div>
 						<div class="row mb-3">
 							<label for="inputNumber"class="col-sm-2 col-form-label">Precio: </label>
 											<div class="col-sm-10">
-												<input type="number" class="form-control" id="precio" name="precio" placeholder="Ingrese la precio del producto" autocompete="off" required>						
+												<input type="number" class="form-control" id="precio" name="precio" placeholder="Ingrese la precio del producto" autocompete="off" required
+												th:value="${producto.precio}">						
 											</div>
 						</div>
 						<div class="row mb-3">
 							<label for="inputNumber"class="col-sm-2 col-form-label">Cantidad: </label>
 												<div class="col-sm-10">
-													<input type="nuber" class="form-control" id="cantidad" name="cantidad" placeholder="Ingrese la cantidad del producto" autocompete="off" required>						
+													<input type="nuber" class="form-control" id="cantidad" name="cantidad" placeholder="Ingrese la cantidad del producto" autocompete="off" required
+													th:value="${producto.cantidad}">						
 												</div>
 						</div>
 						<div class="row mb-3">

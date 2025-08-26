@@ -33,7 +33,7 @@ public class ProductoController {
 	}
 
 	// metodo de redireccionamiento hacia el formulario de creacion de productos
-	@GetMapping("/save")
+	@GetMapping("/create")
 	public String create() {
 		return "producto/create";
 	}
