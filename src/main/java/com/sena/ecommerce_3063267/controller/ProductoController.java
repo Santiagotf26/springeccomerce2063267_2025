@@ -1,5 +1,6 @@
 package com.sena.ecommerce_3063267.controller;
 
+import java.io.IOException;
 import java.util.Optional;
 
 import org.slf4j.LoggerFactory;
@@ -10,10 +11,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.sena.ecommerce_3063267.model.Producto;
 import com.sena.ecommerce_3063267.model.Usuario;
 import com.sena.ecommerce_3063267.service.IProductoService;
+import com.sena.ecommerce_3063267.service.UploadFileService;
 
 @Controller
 @RequestMapping("/producto")
@@ -24,6 +28,9 @@ public class ProductoController {
 
 	@Autowired
 	private IProductoService productoService;
+	
+	@Autowired
+	private UploadFileService upload;
 
 	// metodo de listar productos
 	@GetMapping("")
@@ -40,10 +47,16 @@ public class ProductoController {
 
 	// metodo de creacion de productos
 	@PostMapping("/save")
-	public String save(Producto producto) {
+	public String save(Producto producto, @RequestParam("img") MultipartFile file) throws IOException{
 		LOGGER.info("Este es el objeto del producto a guardar en la DB {}", producto);
 		Usuario u = new Usuario(1, "", "", "", "", "", "", "", "");
 		producto.setUsuario(u);
+		//validacion imagen del producto
+		if (producto.getId()== null) {
+			String nombreImagen = upload.saveImages(file, producto.getNombre());
+			producto.setImagen(nombreImagen);
+			
+		}
 		productoService.save(producto);
 		return "redirect:/producto";
 	}
@@ -62,10 +75,21 @@ public class ProductoController {
 
 	// metodo de actualizacion de datos
 	@PostMapping("/update")
-	public String update(Producto producto) {
+	public String update(Producto producto, @RequestParam("img") MultipartFile file) throws IOException {
 		LOGGER.info("Este es el objeto del producto a actualizar en la DB {}", producto);
-		Usuario u = new Usuario(1, "", "", "", "", "", "", "", "");
-		producto.setUsuario(u);
+		Producto p =  new Producto();
+		p = productoService.get(producto.getId()).get();
+		if (file.isEmpty()) {
+			producto.setImagen(p.getImagen());
+			
+		} else {
+			if (!p.getImagen().equals("default.jpg")) {
+				upload.deleteImage(p.getImagen());
+			}
+			String nombreImagen = upload.saveImages(file, p.getNombre());
+			producto.setImagen(nombreImagen);
+		}
+		producto.setUsuario(p.getUsuario());
 		productoService.update(producto);
 		return "redirect:/producto";
 	}
@@ -73,6 +97,12 @@ public class ProductoController {
 	// metodo para eliminar con id un producto
 	@GetMapping("/delete/{id}")
 	public String delet(@PathVariable Integer id) {
+		Producto  p = new Producto();
+		p = productoService.get(id).get();
+		if (!p.getImagen().equals("default.jpg")) {
+			upload.deleteImage(p.getImagen());
+			
+		}
 		productoService.delete(id);
 		return "redirect:/producto";
 	}
