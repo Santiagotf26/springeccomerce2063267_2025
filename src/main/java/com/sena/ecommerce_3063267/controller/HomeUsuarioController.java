@@ -10,7 +10,7 @@ import com.sena.ecommerce_3063267.service.IProductoService;
 
 @Controller
 @RequestMapping("/")
-public class UsuarioController {
+public class HomeUsuarioController {
 	
 	// instancia de producto service
 	@Autowired
