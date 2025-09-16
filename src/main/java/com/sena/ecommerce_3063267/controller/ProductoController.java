@@ -3,6 +3,7 @@ package com.sena.ecommerce_3063267.controller;
 import java.io.IOException;
 import java.util.Optional;
 
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -20,68 +21,66 @@ import com.sena.ecommerce_3063267.service.IProductoService;
 import com.sena.ecommerce_3063267.service.UploadFileService;
 
 @Controller
-@RequestMapping("/producto")
+@RequestMapping("/productos")
 public class ProductoController {
 
-	// instancia logger
-	private final org.slf4j.Logger LOGGER = (org.slf4j.Logger) LoggerFactory.getLogger(ProductoController.class);
+	// instancia LOGGER
+	private final Logger LOGGER = (Logger) LoggerFactory.getLogger(ProductoController.class);
 
 	@Autowired
-	private IProductoService productoService;
-	
+	private IProductoService productoservice;
+
 	@Autowired
 	private UploadFileService upload;
 
 	// metodo de listar productos
 	@GetMapping("")
 	public String show(Model model) {
-		model.addAttribute("productos", productoService.findAll());
-		return "producto/show";
+		model.addAttribute("productos", productoservice.findAll());
+		return "productos/show";
 	}
 
-	// metodo de redireccionamiento hacia el formulario de creacion de productos
+	// metodo de redireccionamiento a el formulario de creacion de productos
 	@GetMapping("/create")
 	public String create() {
-		return "producto/create";
+		return "productos/create";
 	}
 
 	// metodo de creacion de productos
 	@PostMapping("/save")
-	public String save(Producto producto, @RequestParam("img") MultipartFile file) throws IOException{
+	public String save(Producto producto, @RequestParam("img") MultipartFile file) throws IOException {
 		LOGGER.info("Este es el objeto del producto a guardar en la DB {}", producto);
 		Usuario u = new Usuario(1, "", "", "", "", "", "", "", "");
 		producto.setUsuario(u);
-		//validacion imagen del producto
-		if (producto.getId()== null) {
+		// validacion imagen del producto
+		if (producto.getId() == null) {
 			String nombreImagen = upload.saveImages(file, producto.getNombre());
 			producto.setImagen(nombreImagen);
-			
 		}
-		productoService.save(producto);
-		return "redirect:/producto";
+		productoservice.save(producto);
+		return "redirect:/productos";
 	}
 
 	// metodo para el formulario de edicion de productos
 	@GetMapping("/edit/{id}")
 	public String edit(@PathVariable Integer id, Model model) {
 		Producto p = new Producto();
-		// retorna la busqueda de un objeto de tipo producto con el id
-		Optional<Producto> op = productoService.get(id);
+		// nos retorna la busqueda de un objeto de tipo producto con el id
+		Optional<Producto> op = productoservice.get(id);
 		p = op.get();
 		LOGGER.warn("Busqueda de producto por id {}", p);
 		model.addAttribute("producto", p);
-		return "producto/edit";
+		return "productos/edit";
 	}
 
 	// metodo de actualizacion de datos
 	@PostMapping("/update")
 	public String update(Producto producto, @RequestParam("img") MultipartFile file) throws IOException {
 		LOGGER.info("Este es el objeto del producto a actualizar en la DB {}", producto);
-		Producto p =  new Producto();
-		p = productoService.get(producto.getId()).get();
+		Producto p = new Producto();
+		p = productoservice.get(producto.getId()).get();
 		if (file.isEmpty()) {
 			producto.setImagen(p.getImagen());
-			
 		} else {
 			if (!p.getImagen().equals("default.jpg")) {
 				upload.deleteImage(p.getImagen());
@@ -90,21 +89,19 @@ public class ProductoController {
 			producto.setImagen(nombreImagen);
 		}
 		producto.setUsuario(p.getUsuario());
-		productoService.update(producto);
-		return "redirect:/producto";
+		productoservice.update(producto);
+		return "redirect:/productos";
 	}
 
 	// metodo para eliminar con id un producto
 	@GetMapping("/delete/{id}")
-	public String delet(@PathVariable Integer id) {
-		Producto  p = new Producto();
-		p = productoService.get(id).get();
+	public String delete(@PathVariable Integer id) {
+		Producto p = new Producto();
+		p = productoservice.get(id).get();
 		if (!p.getImagen().equals("default.jpg")) {
 			upload.deleteImage(p.getImagen());
-			
 		}
-		productoService.delete(id);
-		return "redirect:/producto";
+		productoservice.delete(id);
+		return "redirect:/productos";
 	}
-
 }
